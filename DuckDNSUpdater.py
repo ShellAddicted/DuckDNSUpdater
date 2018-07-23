@@ -2,15 +2,16 @@
 import logging
 import os
 import time
-import sys
 import urllib.request
 import urllib.parse
 
-#Settings (Edit THIS!) you can obtain this from you duckdns.org account
+# Settings (Edit THIS!) you can obtain this from you duckdns.org account
 TOKEN = ""
 DOMAINS = [""]
+LOG_PATH = "./DuckDNSLogs/"
 
-def updateDuckDNSDomains(domains:list, token:str, ipv4:str="", ipv6:str="", clear:bool=False, num_rounds=3):
+
+def updateDuckDNSDomains(domains: list, token: str, ipv4: str = "", ipv6: str = "", clear: bool = False, num_rounds=3):
     # https://www.duckdns.org/update?domains={YOURVALUE}&token={YOURVALUE}[&ip={YOURVALUE}][&ipv6={YOURVALUE}][&verbose=true][&clear=true]
     # domains - REQUIRED - comma separated list of the subnames you want to update
     # token - REQUIRED - your account token
@@ -18,7 +19,12 @@ def updateDuckDNSDomains(domains:list, token:str, ipv4:str="", ipv6:str="", clea
     # ipv6 - OPTIONAL - a valid IPv6 address, if you specify this then the autodetection for ip is not used
     # verbose - OPTIONAL - if set to true, you get information back about how the request went
     # clear - OPTIONAL - if set to true, the update will ignore all ip's and clear both your records 
-    url = "https://www.duckdns.org/update?" + urllib.parse.urlencode({"domains": ",".join(domains), "token": token, "ip": ipv4, "ipv6": ipv6, "clear": str(clear).lower()})
+    url = "https://www.duckdns.org/update?" + urllib.parse.urlencode({"domains": ",".join(domains),
+                                                                      "token": token,
+                                                                      "ip": ipv4,
+                                                                      "ipv6": ipv6,
+                                                                      "clear": str(clear).lower()
+                                                                      })
     for round in range(num_rounds):
         try:
             with urllib.request.urlopen(url) as conn:
@@ -30,21 +36,21 @@ def updateDuckDNSDomains(domains:list, token:str, ipv4:str="", ipv6:str="", clea
             continue
     return False
 
+
 if __name__ == "__main__":
-    if not os.path.exists("./Logs/"):
-        os.mkdir("Logs")
+    if not os.path.exists(LOG_PATH):
+        os.mkdir(LOG_PATH)
 
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s -->> %(message)s",
         handlers=[
-            logging.FileHandler("./Logs/{0}.log".format(time.strftime("%Y-%m-%d"))),
+            logging.FileHandler(os.path.join(LOG_PATH,time.strftime("%Y-%m-%d.log"))),
             logging.StreamHandler()
         ]
     )
     log = logging.getLogger("DuckDNSUpdater")
-    if updateDuckDNSDomains(DOMAINS,TOKEN):
+    if updateDuckDNSDomains(DOMAINS, TOKEN):
         log.info("Update: OK")
     else:
         log.error("Update: FAIL")
-
