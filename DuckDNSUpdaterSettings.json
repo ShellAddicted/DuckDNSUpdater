@@ -1,0 +1,7 @@
+{
+  "DuckDNS.org": {
+    "Token": "",
+    "SubDomains": []
+  },
+  "LogPath": "./DuckDNSUpdaterLogs/"
+}
